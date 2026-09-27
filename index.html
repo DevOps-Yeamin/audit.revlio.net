@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Revlio Free Website Audit | Instant Security, Speed & SEO Analysis</title>
+  <meta name="description" content="Audit your website in seconds. Passive 100-point security headers, SSL, Core Web Vitals, and SEO health scanner with actionable developer fixes.">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            revlio: {
+              dark: '#07090e',
+              surface: '#111622',
+              card: '#161d2d',
+              border: '#232d42',
+              accent: '#3b82f6',
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <!-- Inter Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      background-color: #07090e;
+      color: #f8fafc;
+      font-family: 'Inter', sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .radar-sweep {
+      background: conic-gradient(from 0deg, rgba(59, 130, 246, 0.4) 0deg, transparent 60deg, transparent 360deg);
+      animation: rotateSweep 2.5s linear infinite;
+    }
+    @keyframes rotateSweep {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    @media print {
+      body { background: white !important; color: black !important; }
+      .no-print { display: none !important; }
+      .print-only { display: block !important; }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-blue-600 selection:text-white">
+
+  <!-- ================= NAVBAR ================= -->
+  <header class="sticky top-0 z-40 w-full border-b border-revlio-border bg-revlio-dark/85 backdrop-blur-md no-print">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <a href="/" class="flex items-center gap-3 group">
+        <div class="h-9 w-9 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/20 group-hover:scale-105 transition-transform">
+          <i data-lucide="shield-check" class="h-5 w-5 text-white"></i>
+        </div>
+        <div class="flex flex-col">
+          <div class="flex items-center gap-1.5">
+            <span class="font-black text-lg tracking-tight text-white">REVLIO</span>
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-500/15 text-blue-400 border border-blue-500/30">
+              AUDIT
+            </span>
+          </div>
+          <span class="text-[9px] text-slate-400 tracking-wider uppercase">Free Website Scanner</span>
+        </div>
+      </a>
+
+      <div class="flex items-center gap-3">
+        <div class="hidden md:flex items-center gap-2 text-xs text-slate-400 border border-revlio-border px-3 py-1.5 rounded-full bg-revlio-surface/50">
+          <span class="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span>OWASP & Google PageSpeed Engine</span>
+        </div>
+        <a href="https://revlio.net" target="_blank" class="text-xs font-medium text-slate-300 hover:text-white px-3 py-1.5 rounded-lg border border-revlio-border hover:bg-revlio-card transition-colors">
+          Revlio.net
+        </a>
+        <a href="https://revlio.net/contact" target="_blank" class="hidden sm:flex items-center gap-1.5 text-xs font-bold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 px-3.5 py-2 rounded-lg shadow-md shadow-blue-600/20 transition-all hover:scale-105">
+          <i data-lucide="sparkles" class="h-3.5 w-3.5"></i>
+          <span>Book Consultation</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= MAIN CONTENT ================= -->
+  <main class="flex-1">
+
+    <!-- ERROR NOTIFICATION BANNER -->
+    <div id="errorBanner" class="hidden max-w-4xl mx-auto mt-6 px-4">
+      <div class="p-4 rounded-2xl bg-rose-950/50 border border-rose-500/40 text-rose-300 text-sm flex items-center justify-between shadow-lg">
+        <div class="flex items-center gap-2">
+          <span class="font-bold">⚠️ Scan Notice:</span>
+          <span id="errorMessageText"></span>
+        </div>
+        <button onclick="hideError()" class="text-xs font-semibold underline text-rose-400 hover:text-white">Dismiss</button>
+      </div>
+    </div>
+
+    <!-- 1. HERO SCANNER SECTION -->
+    <section id="heroSection" class="relative pt-12 pb-16 md:pt-20 md:pb-24 overflow-hidden">
+      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[350px] bg-blue-600/15 blur-[120px] rounded-full pointer-events-none -z-10"></div>
+      
+      <div class="max-w-4xl mx-auto px-4 sm:px-6 text-center">
+        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-blue-500/30 bg-blue-500/10 text-blue-300 text-xs font-semibold uppercase tracking-wider mb-6 shadow-inner">
+          <i data-lucide="shield-check" class="h-4 w-4 text-blue-400"></i>
+          <span>Enterprise-Grade Passive Website Audit</span>
+        </div>
+
+        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white leading-tight mb-6">
+          Uncover Hidden Security, SEO & Speed Bottlenecks in <span class="bg-gradient-to-r from-blue-400 via-indigo-300 to-teal-300 bg-clip-text text-transparent">Seconds</span>
+        </h1>
+
+        <p class="text-base sm:text-lg text-slate-300 max-w-2xl mx-auto mb-10 leading-relaxed">
+          Comprehensive 100-point passive audit inspecting SSL certificates, OWASP security headers, on-page SEO, Core Web Vitals, and tech stack fingerprints.
+        </p>
+
+        <!-- Audit Form -->
+        <form id="auditForm" onsubmit="handleAuditSubmit(event)" class="max-w-2xl mx-auto mb-6">
+          <div class="relative flex flex-col sm:flex-row items-center gap-2 p-2 rounded-2xl bg-revlio-surface border border-revlio-border shadow-2xl shadow-blue-950/40 focus-within:border-blue-500/70 focus-within:ring-2 focus-within:ring-blue-500/20 transition-all">
+            <div class="flex items-center gap-3 w-full pl-3 pr-2 py-2">
+              <i data-lucide="globe" class="h-5 w-5 text-slate-400 flex-shrink-0"></i>
+              <input type="text" id="targetUrl" placeholder="Enter your website URL (e.g. yourcompany.com)" required class="w-full bg-transparent text-white placeholder-slate-500 text-sm sm:text-base focus:outline-none">
+            </div>
+            
+            <button type="submit" id="submitBtn" class="w-full sm:w-auto flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-500 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-sm sm:text-base px-7 py-3.5 rounded-xl shadow-lg shadow-blue-600/30 hover:shadow-blue-600/50 transition-all hover:scale-[1.02] flex-shrink-0">
+              <span>AUDIT MY WEBSITE</span>
+              <i data-lucide="arrow-right" class="h-4 w-4"></i>
+            </button>
+          </div>
+        </form>
+
+        <!-- Quick Select Pills -->
+        <div class="flex flex-wrap items-center justify-center gap-2 text-xs text-slate-400 mb-12">
+          <span class="text-slate-500">Try popular domains:</span>
+          <button onclick="setAndAudit('revlio.net')" class="px-2.5 py-1 rounded-lg border border-revlio-border bg-revlio-card/60 hover:bg-revlio-surface text-slate-300 hover:text-white transition-colors">revlio.net</button>
+          <button onclick="setAndAudit('stripe.com')" class="px-2.5 py-1 rounded-lg border border-revlio-border bg-revlio-card/60 hover:bg-revlio-surface text-slate-300 hover:text-white transition-colors">stripe.com</button>
+          <button onclick="setAndAudit('shopify.com')" class="px-2.5 py-1 rounded-lg border border-revlio-border bg-revlio-card/60 hover:bg-revlio-surface text-slate-300 hover:text-white transition-colors">shopify.com</button>
+        </div>
+
+        <!-- Feature Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto text-left pt-8 border-t border-revlio-border/60">
+          <div class="rounded-2xl border border-revlio-border bg-revlio-card/60 p-6">
+            <div class="h-10 w-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 mb-4">
+              <i data-lucide="shield-check" class="h-5 w-5"></i>
+            </div>
+            <h3 class="text-base font-bold text-white mb-1">OWASP Header Validation</h3>
+            <p class="text-xs text-slate-400 leading-relaxed">Deep evaluation of Content-Security-Policy (CSP), HSTS, Clickjacking defense, MIME sniffing, and version disclosure.</p>
+          </div>
+
+          <div class="rounded-2xl border border-revlio-border bg-revlio-card/60 p-6">
+            <div class="h-10 w-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 mb-4">
+              <i data-lucide="sparkles" class="h-5 w-5"></i>
+            </div>
+            <h3 class="text-base font-bold text-white mb-1">100-Point Weighted Score</h3>
+            <p class="text-xs text-slate-400 leading-relaxed">Objective mathematical model weighting Security (25%), Performance (25%), SEO (20%), Technical (15%), and Usability (15%).</p>
+          </div>
+
+          <div class="rounded-2xl border border-revlio-border bg-revlio-card/60 p-6">
+            <div class="h-10 w-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 mb-4">
+              <i data-lucide="check-circle-2" class="h-5 w-5"></i>
+            </div>
+            <h3 class="text-base font-bold text-white mb-1">Developer Remediation Fixes</h3>
+            <p class="text-xs text-slate-400 leading-relaxed">Actionable, copy-paste code snippets and Nginx/Apache configuration rules ready for immediate deployment.</p>
+          </div>
+        </div>
+
+        <!-- Recent Audits Feed -->
+        <div id="recentSection" class="mt-12 pt-8 border-t border-revlio-border/60">
+          <span class="text-xs font-semibold uppercase tracking-wider text-slate-500 block mb-4">Recently Audited Domains</span>
+          <div id="recentList" class="flex flex-wrap items-center justify-center gap-3"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. RADAR SCANNING ANIMATION SECTION -->
+    <section id="scanningSection" class="hidden max-w-2xl mx-auto px-4 py-16 text-center">
+      <div class="relative w-36 h-36 mx-auto mb-8 flex items-center justify-center">
+        <div class="absolute inset-0 rounded-full border border-blue-500/30 animate-ping opacity-75"></div>
+        <div class="absolute inset-2 rounded-full border border-indigo-500/40 animate-pulse"></div>
+        <div class="absolute inset-4 rounded-full border border-blue-500/20 bg-revlio-surface/80 backdrop-blur-md"></div>
+        <div class="absolute inset-0 rounded-full overflow-hidden">
+          <div class="w-full h-full radar-sweep origin-center"></div>
+        </div>
+        <div class="relative z-10 h-14 w-14 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center shadow-xl shadow-blue-500/40">
+          <i data-lucide="shield" class="h-7 w-7 text-white animate-pulse"></i>
+        </div>
+      </div>
+
+      <h3 class="text-xl sm:text-2xl font-bold text-white mb-2">Scanning <span id="scanningDomainText" class="text-blue-400">...</span></h3>
+      <p class="text-xs sm:text-sm text-slate-400 mb-8">Conducting non-invasive passive reconnaissance. Please hold on...</p>
+
+      <div class="bg-revlio-card/80 border border-revlio-border rounded-2xl p-5 sm:p-6 text-left space-y-3 shadow-xl backdrop-blur-sm">
+        <div id="step1" class="flex items-center gap-3 text-xs sm:text-sm text-blue-300 font-semibold">
+          <div class="h-4 w-4 border-2 border-blue-400 border-t-transparent rounded-full animate-spin"></div>
+          <span>Validating SSL/TLS certificates & cipher suites...</span>
+        </div>
+        <div id="step2" class="flex items-center gap-3 text-xs sm:text-sm text-slate-500">
+          <i data-lucide="shield" class="h-4 w-4"></i>
+          <span>Evaluating OWASP security headers (CSP, HSTS, XFO)...</span>
+        </div>
+        <div id="step3" class="flex items-center gap-3 text-xs sm:text-sm text-slate-500">
+          <i data-lucide="search" class="h-4 w-4"></i>
+          <span>Analyzing on-page SEO, metadata, robots.txt & sitemaps...</span>
+        </div>
+        <div id="step4" class="flex items-center gap-3 text-xs sm:text-sm text-slate-500">
+          <i data-lucide="cpu" class="h-4 w-4"></i>
+          <span>Fingerprinting frameworks, CMS, CDN & analytics...</span>
+        </div>
+        <div id="step5" class="flex items-center gap-3 text-xs sm:text-sm text-slate-500">
+          <i data-lucide="zap" class="h-4 w-4"></i>
+          <span>Synthesizing 100-point weighted Revlio score...</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. TEASER SCORE & PREVIEW SECTION -->
+    <section id="teaserSection" class="hidden max-w-4xl mx-auto px-4 sm:px-6 py-8">
+      <div class="flex justify-end mb-4">
+        <button onclick="resetAudit()" class="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-white px-3 py-1.5 rounded-lg border border-revlio-border bg-revlio-card hover:bg-revlio-surface transition-colors">
+          <i data-lucide="refresh-cw" class="h-3.5 w-3.5"></i>
+          <span>Scan Another Website</span>
+        </button>
+      </div>
+
+      <!-- Score Banner -->
+      <div class="rounded-3xl border border-revlio-border bg-gradient-to-b from-revlio-surface to-revlio-card p-6 sm:p-8 shadow-2xl relative overflow-hidden mb-8">
+        <div class="flex flex-col md:flex-row items-center justify-between gap-8">
+          <!-- Left: Score Gauge -->
+          <div class="flex flex-col sm:flex-row items-center gap-6 text-center sm:text-left">
+            <div id="teaserScoreGaugeContainer" class="relative"></div>
+
+            <div>
+              <span class="text-xs font-semibold uppercase tracking-wider text-blue-400 bg-blue-500/10 px-2.5 py-1 rounded-full border border-blue-500/20">Audit Summary</span>
+              <h2 id="teaserDomainText" class="text-2xl sm:text-3xl font-extrabold text-white mt-2">example.com</h2>
+              <p class="text-xs sm:text-sm text-slate-400 mt-1 max-w-sm">Composite evaluation weighted across OWASP security, Core Web Vitals, and indexability.</p>
+              
+              <div class="flex flex-wrap items-center gap-2 mt-4 justify-center sm:justify-start">
+                <span id="teaserCritBadge" class="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-lg bg-rose-500/15 text-rose-300 border border-rose-500/30">0 Critical</span>
+                <span id="teaserWarnBadge" class="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-lg bg-amber-500/15 text-amber-300 border border-amber-500/30">0 Warnings</span>
+                <span id="teaserPassBadge" class="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-lg bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">0 Passed</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Category Bars -->
+          <div id="teaserCategoryBars" class="w-full md:w-72 bg-revlio-surface/60 border border-revlio-border/80 rounded-2xl p-4 sm:p-5 space-y-3"></div>
+        </div>
+      </div>
+
+      <!-- Preview Issues -->
+      <div class="mb-8">
+        <h3 class="text-lg sm:text-xl font-bold text-white mb-2">High-Priority Issues Discovered</h3>
+        <p class="text-xs sm:text-sm text-slate-400 mb-4">Showing top findings requiring immediate remediation.</p>
+        <div id="teaserPreviewIssues" class="space-y-3"></div>
+      </div>
+
+      <!-- Lead Capture Gate Banner -->
+      <div class="relative rounded-3xl border border-blue-500/40 bg-gradient-to-b from-blue-950/40 via-revlio-surface to-revlio-card p-6 sm:p-10 text-center shadow-2xl overflow-hidden">
+        <div class="h-12 w-12 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-blue-500/30">
+          <i data-lucide="lock" class="h-6 w-6 text-white"></i>
+        </div>
+        <span class="inline-block text-xs font-bold uppercase tracking-wider text-blue-400 bg-blue-500/10 px-3 py-1 rounded-full border border-blue-500/30 mb-3">Unlock Full Free Report</span>
+        <h3 class="text-2xl sm:text-3xl font-extrabold text-white mb-3">Get Your Complete Website Audit & Action Plan</h3>
+        <p class="text-xs sm:text-sm text-slate-300 mb-6 max-w-xl mx-auto">Unlock all hidden findings, complete technology stack fingerprints, Core Web Vitals diagnostic charts, and instant developer remediation checklists.</p>
+        <button onclick="openLeadModal()" class="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-500 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-sm sm:text-base px-8 py-4 rounded-xl shadow-xl shadow-blue-600/30 transition-all hover:scale-105">
+          <i data-lucide="sparkles" class="h-5 w-5"></i>
+          <span>UNLOCK FULL AUDIT REPORT</span>
+          <i data-lucide="arrow-right" class="h-5 w-5"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- 4. FULL UNLOCKED AUDIT REPORT -->
+    <section id="unlockedSection" class="hidden max-w-6xl mx-auto px-4 sm:px-6 py-8">
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8 pb-6 border-b border-revlio-border">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="h-2.5 w-2.5 rounded-full bg-emerald-400"></span>
+            <span class="text-xs font-bold uppercase tracking-wider text-emerald-400">Full Unlocked Report</span>
+          </div>
+          <h2 id="unlockedDomainTitle" class="text-2xl sm:text-3xl font-extrabold text-white mt-1">Audit for domain.com</h2>
+          <p id="unlockedUrlSubtitle" class="text-xs sm:text-sm text-slate-400 font-mono"></p>
+        </div>
+
+        <div class="flex items-center gap-3 no-print">
+          <button onclick="window.print()" class="inline-flex items-center gap-2 text-xs font-semibold text-slate-300 hover:text-white bg-revlio-card border border-revlio-border hover:border-slate-600 px-4 py-2.5 rounded-xl shadow-sm">
+            <i data-lucide="printer" class="h-4 w-4 text-blue-400"></i>
+            <span>Export / Print PDF</span>
+          </button>
+          <a href="https://revlio.net/contact" target="_blank" class="inline-flex items-center gap-1.5 text-xs font-bold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 px-4 py-2.5 rounded-xl shadow-md shadow-blue-600/20 transition-all hover:scale-105">
+            <span>Book Strategy Call</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Tabs Navigation -->
+      <div class="flex items-center gap-2 overflow-x-auto pb-2 mb-6 scrollbar-none no-print">
+        <button onclick="switchTab('overview')" id="tabBtn-overview" class="tab-btn active-tab flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-xs sm:text-sm bg-blue-600 text-white shadow-lg">Overview</button>
+        <button onclick="switchTab('security')" id="tabBtn-security" class="tab-btn flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-xs sm:text-sm bg-revlio-card text-slate-400 border border-revlio-border">Security & OWASP</button>
+        <button onclick="switchTab('performance')" id="tabBtn-performance" class="tab-btn flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-xs sm:text-sm bg-revlio-card text-slate-400 border border-revlio-border">Performance & CWV</button>
+        <button onclick="switchTab('seo')" id="tabBtn-seo" class="tab-btn flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-xs sm:text-sm bg-revlio-card text-slate-400 border border-revlio-border">SEO & Metadata</button>
+        <button onclick="switchTab('technical')" id="tabBtn-technical" class="tab-btn flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-xs sm:text-sm bg-revlio-card text-slate-400 border border-revlio-border">Technical & Mobile</button>
+        <button onclick="switchTab('techstack')" id="tabBtn-techstack" class="tab-btn flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-xs sm:text-sm bg-revlio-card text-slate-400 border border-revlio-border">Tech Stack</button>
+      </div>
+
+      <!-- Tab Content Panels -->
+      <div id="tabContent-overview" class="tab-content space-y-6">
+        <!-- Overview Score Grid -->
+        <div id="unlockedScoreGrid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3"></div>
+        <!-- Core Web Vitals Grid -->
+        <div>
+          <h3 class="text-base font-bold text-white mb-3">Core Web Vitals & Real-User Performance</h3>
+          <div id="unlockedCwvGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"></div>
+        </div>
+        <!-- All Findings -->
+        <div>
+          <h3 class="text-base font-bold text-white mb-3">All Diagnosed Audit Items</h3>
+          <div id="unlockedAllIssues" class="space-y-3"></div>
+        </div>
+      </div>
+
+      <div id="tabContent-security" class="tab-content hidden space-y-4">
+        <div id="unlockedSecurityIssues" class="space-y-3"></div>
+      </div>
+
+      <div id="tabContent-performance" class="tab-content hidden space-y-4">
+        <div id="unlockedPerfCwv" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4"></div>
+        <div id="unlockedPerfIssues" class="space-y-3"></div>
+      </div>
+
+      <div id="tabContent-seo" class="tab-content hidden space-y-4">
+        <div id="unlockedSeoIssues" class="space-y-3"></div>
+      </div>
+
+      <div id="tabContent-technical" class="tab-content hidden space-y-4">
+        <div id="unlockedTechIssues" class="space-y-3"></div>
+      </div>
+
+      <div id="tabContent-techstack" class="tab-content hidden space-y-4">
+        <div class="rounded-3xl border border-revlio-border bg-revlio-card/80 p-6 sm:p-8">
+          <h3 class="text-lg font-bold text-white mb-2">Detected Technologies</h3>
+          <p class="text-xs text-slate-400 mb-6">Frameworks, CMS, CDN, and marketing trackers discovered via headers, cookies, and DOM fingerprints.</p>
+          <div id="unlockedTechBadges" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3"></div>
+        </div>
+      </div>
+
+      <!-- Sales CTA Banner -->
+      <div class="my-12 p-8 rounded-3xl border border-blue-500/40 bg-gradient-to-r from-blue-950/60 via-indigo-950/40 to-slate-900 shadow-2xl flex flex-col md:flex-row items-center justify-between gap-6 no-print">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-wider text-blue-400 bg-blue-500/10 px-3 py-1 rounded-full border border-blue-500/20">Revlio Engineering Services</span>
+          <h3 class="text-2xl font-extrabold text-white mt-2 mb-1">Need Help Fixing These Issues?</h3>
+          <p class="text-xs sm:text-sm text-slate-300 max-w-xl">Revlio senior engineers will audit your infrastructure, configure enterprise CSP/HSTS, optimize PageSpeed, and harden your web assets.</p>
+        </div>
+        <a href="https://revlio.net/contact" target="_blank" class="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-sm px-6 py-3.5 rounded-xl shadow-lg shadow-blue-600/30 flex-shrink-0">
+          <span>Book Strategy Call</span>
+          <i data-lucide="arrow-right" class="h-4 w-4"></i>
+        </a>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ================= LEAD CAPTURE MODAL ================= -->
+  <div id="leadModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+    <div class="relative w-full max-w-lg rounded-3xl border border-revlio-border bg-revlio-surface p-6 sm:p-8 shadow-2xl">
+      <button onclick="closeLeadModal()" class="absolute top-5 right-5 text-slate-400 hover:text-white p-1 rounded-lg hover:bg-revlio-card">
+        <i data-lucide="x" class="h-5 w-5"></i>
+      </button>
+
+      <div class="text-center mb-6">
+        <div class="h-11 w-11 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center mx-auto mb-3 shadow-lg shadow-blue-500/20">
+          <i data-lucide="sparkles" class="h-5 w-5 text-white"></i>
+        </div>
+        <span class="text-[10px] font-bold uppercase tracking-wider text-blue-400 bg-blue-500/10 px-2.5 py-1 rounded-full border border-blue-500/20">Official Revlio Audit Report</span>
+        <h3 class="text-xl sm:text-2xl font-bold text-white mt-2">Unlock Full Audit Report</h3>
+        <p class="text-xs sm:text-sm text-slate-400 mt-1">Where should we send your complete PDF analysis and developer remediation plan?</p>
+      </div>
+
+      <div class="bg-revlio-card/80 border border-revlio-border/60 rounded-xl p-3 mb-6 space-y-1.5 text-xs text-slate-300">
+        <div class="flex items-center gap-2">
+          <i data-lucide="check-circle-2" class="h-3.5 w-3.5 text-emerald-400"></i>
+          <span>Complete 25+ point OWASP security & header diagnostics</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <i data-lucide="check-circle-2" class="h-3.5 w-3.5 text-emerald-400"></i>
+          <span>Core Web Vitals & Google PageSpeed mobile speed breakdown</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <i data-lucide="check-circle-2" class="h-3.5 w-3.5 text-emerald-400"></i>
+          <span>Automated report delivery from <code class="text-blue-300 font-mono">hello@revlio.net</code></span>
+        </div>
+      </div>
+
+      <form id="leadForm" onsubmit="handleLeadSubmit(event)" class="space-y-3">
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Full Name <span class="text-rose-400">*</span></label>
+          <input type="text" id="leadName" required placeholder="John Doe" class="w-full bg-revlio-card border border-revlio-border rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-blue-500">
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Business Email <span class="text-rose-400">*</span></label>
+          <input type="email" id="leadEmail" required placeholder="john@company.com" class="w-full bg-revlio-card border border-revlio-border rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-blue-500">
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Company</label>
+            <input type="text" id="leadCompany" placeholder="Acme Corp" class="w-full bg-revlio-card border border-revlio-border rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-blue-500">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Phone</label>
+            <input type="tel" id="leadPhone" placeholder="+1 (555) 000-0000" class="w-full bg-revlio-card border border-revlio-border rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-blue-500">
+          </div>
+        </div>
+
+        <button type="submit" id="leadSubmitBtn" class="w-full mt-2 flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-500 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-sm py-3.5 rounded-xl shadow-lg shadow-blue-600/30 transition-all hover:scale-[1.02]">
+          <span>SEND MY REPORT & UNLOCK ACCESS</span>
+          <i data-lucide="arrow-right" class="h-4 w-4"></i>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= FOOTER ================= -->
+  <footer class="w-full border-t border-revlio-border bg-revlio-dark text-slate-400 text-xs py-8 no-print">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-slate-500">
+      <p>© 2026 Revlio. All rights reserved. Passive, non-destructive audit engine adhering to OWASP guidance.</p>
+      <div class="flex items-center gap-4">
+        <a href="https://revlio.net" target="_blank" class="hover:text-white transition-colors">Revlio.net</a>
+        <a href="https://revlio.net/contact" target="_blank" class="hover:text-white transition-colors">Support</a>
+        <a href="mailto:hello@revlio.net" class="hover:text-white transition-colors">hello@revlio.net</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ================= JAVASCRIPT APP LOGIC ================= -->
+  <script>
+    let currentAudit = null;
+
+    // Initialize Lucide icons
+    document.addEventListener("DOMContentLoaded", () => {
+      lucide.createIcons();
+      fetchRecentAudits();
+    });
+
+    function showError(msg) {
+      document.getElementById('errorMessageText').innerText = msg;
+      document.getElementById('errorBanner').classList.remove('hidden');
+    }
+    function hideError() {
+      document.getElementById('errorBanner').classList.add('hidden');
+    }
+
+    function setAndAudit(url) {
+      document.getElementById('targetUrl').value = url;
+      handleAuditSubmit(new Event('submit'));
+    }
+
+    async function handleAuditSubmit(e) {
+      if (e && e.preventDefault) e.preventDefault();
+      hideError();
+
+      const url = document.getElementById('targetUrl').value.trim();
+      if (!url) return;
+
+      // Show Scanning State
+      document.getElementById('heroSection').classList.add('hidden');
+      document.getElementById('teaserSection').classList.add('hidden');
+      document.getElementById('unlockedSection').classList.add('hidden');
+      document.getElementById('scanningSection').classList.remove('hidden');
+      document.getElementById('scanningDomainText').innerText = url;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      // Step animations
+      const steps = ['step1', 'step2', 'step3', 'step4', 'step5'];
+      let stepIdx = 0;
+      const stepTimer = setInterval(() => {
+        if (stepIdx < steps.length - 1) {
+          document.getElementById(steps[stepIdx]).className = 'flex items-center gap-3 text-xs sm:text-sm text-slate-400';
+          document.getElementById(steps[stepIdx]).innerHTML = `<i data-lucide="check-circle-2" class="h-4 w-4 text-emerald-400"></i><span>` + document.getElementById(steps[stepIdx]).innerText + `</span>`;
+          stepIdx++;
+          document.getElementById(steps[stepIdx]).className = 'flex items-center gap-3 text-xs sm:text-sm text-blue-300 font-semibold';
+          lucide.createIcons();
+        }
+      }, 1000);
+
+      try {
+        // Send request to PHP backend (api/audit.php) or FastAPI (/api/audit)
+        const endpoint = window.location.pathname.includes('.php') || !window.location.port ? 'api/audit.php' : '/api/audit';
+        
+        let response = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url })
+        });
+
+        if (!response.ok) {
+          // Fallback test endpoint
+          response = await fetch('api/audit.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ url })
+          });
+        }
+
+        const data = await response.json();
+        clearInterval(stepTimer);
+
+        if (data.status === 'processing') {
+          // Poll until completed
+          pollAudit(data.audit_id);
+        } else if (data.status === 'completed') {
+          renderTeaser(data);
+        } else {
+          throw new Error(data.detail || data.error || 'Scan could not be completed');
+        }
+      } catch (err) {
+        clearInterval(stepTimer);
+        showError(err.message || 'Scan failed. Please check the URL.');
+        resetAudit();
+      }
+    }
+
+    async function pollAudit(id) {
+      const endpoint = window.location.port ? `/api/audit/${id}` : `api/audit.php?id=${id}`;
+      const interval = setInterval(async () => {
+        try {
+          const res = await fetch(endpoint);
+          if (res.ok) {
+            const data = await res.json();
+            if (data.status === 'completed') {
+              clearInterval(interval);
+              renderTeaser(data);
+            }
+          }
+        } catch (e) {}
+      }, 1500);
+    }
+
+    function renderTeaser(data) {
+      currentAudit = data;
+      document.getElementById('scanningSection').classList.add('hidden');
+      document.getElementById('teaserSection').classList.remove('hidden');
+
+      const scores = data.scores || {};
+      const score = scores.overall || 0;
+      const domain = data.domain || '';
+
+      document.getElementById('teaserDomainText').innerText = domain;
+      document.getElementById('teaserCritBadge').innerText = `${data.critical_count} Critical`;
+      document.getElementById('teaserWarnBadge').innerText = `${data.warning_count} Warnings`;
+      document.getElementById('teaserPassBadge').innerText = `${data.passed_count} Passed`;
+
+      // Render circular score gauge
+      document.getElementById('teaserScoreGaugeContainer').innerHTML = createScoreGaugeSvg(score, scores.classification || 'Good');
+
+      // Render category bars
+      const cats = [
+        { label: 'Security', score: scores.security || 0, weight: '25%' },
+        { label: 'Performance', score: scores.performance || 0, weight: '25%' },
+        { label: 'SEO', score: scores.seo || 0, weight: '20%' },
+        { label: 'Technical', score: scores.technical || 0, weight: '15%' },
+        { label: 'Mobile', score: scores.mobile || 0, weight: '10%' },
+        { label: 'Accessibility', score: scores.accessibility || 0, weight: '5%' },
+      ];
+
+      document.getElementById('teaserCategoryBars').innerHTML = `
+        <span class="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-2">Category Breakdown</span>
+        ${cats.map(c => `
+          <div class="space-y-1">
+            <div class="flex justify-between text-xs font-medium">
+              <span class="text-slate-300">${c.label} <span class="text-slate-500 text-[10px]">(${c.weight})</span></span>
+              <span class="text-white font-bold">${c.score}/100</span>
+            </div>
+            <div class="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden">
+              <div class="h-1.5 rounded-full ${getBarColor(c.score)}" style="width: ${c.score}%"></div>
+            </div>
+          </div>
+        `).join('')}
+      `;
+
+      // Render first 3 preview issues
+      const previewIssues = (data.results || []).slice(0, 3);
+      document.getElementById('teaserPreviewIssues').innerHTML = previewIssues.map(createIssueCardHtml).join('');
+
+      lucide.createIcons();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function createScoreGaugeSvg(score, classification) {
+      const radius = 68;
+      const circumference = 2 * Math.PI * radius;
+      const offset = circumference - (score / 100) * circumference;
+      const strokeColor = score >= 90 ? '#10b981' : (score >= 80 ? '#06b6d4' : (score >= 70 ? '#f59e0b' : '#ef4444'));
+
+      return `
+        <div class="relative w-40 h-40 flex items-center justify-center">
+          <svg width="160" height="160" class="transform -rotate-90">
+            <circle cx="80" cy="80" r="${radius}" stroke="#1a2233" stroke-width="12" fill="transparent"/>
+            <circle cx="80" cy="80" r="${radius}" stroke="${strokeColor}" stroke-width="12" stroke-dasharray="${circumference}" stroke-dashoffset="${offset}" stroke-linecap="round" fill="transparent" class="transition-all duration-1000"/>
+          </svg>
+          <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
+            <span class="text-[9px] font-bold tracking-widest text-slate-400 uppercase">REVLIO SCORE</span>
+            <div class="flex items-baseline">
+              <span class="text-4xl font-black tracking-tight text-white">${score}</span>
+              <span class="text-xs font-semibold text-slate-500">/100</span>
+            </div>
+            <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full mt-0.5 bg-blue-500/15 text-blue-300 border border-blue-500/30">${classification}</span>
+          </div>
+        </div>
+      `;
+    }
+
+    function getBarColor(score) {
+      if (score >= 90) return 'bg-emerald-400';
+      if (score >= 80) return 'bg-cyan-400';
+      if (score >= 70) return 'bg-amber-400';
+      return 'bg-rose-400';
+    }
+
+    function createIssueCardHtml(issue) {
+      const isCrit = issue.status === 'critical';
+      const isWarn = issue.status === 'warning';
+      const border = isCrit ? 'border-rose-500/30 bg-rose-950/10' : (isWarn ? 'border-amber-500/30 bg-amber-950/10' : 'border-revlio-border bg-revlio-card/40');
+      const badge = isCrit ? 'bg-rose-500/15 text-rose-300 border-rose-500/30' : (isWarn ? 'bg-amber-500/15 text-amber-300 border-amber-500/30' : 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30');
+
+      return `
+        <div class="rounded-xl border ${border} p-4 text-xs sm:text-sm">
+          <div class="flex items-center gap-2 mb-1.5">
+            <span class="text-[9px] font-bold uppercase px-2 py-0.5 rounded-full border ${badge}">${issue.status.toUpperCase()}</span>
+            <span class="text-[9px] uppercase font-semibold text-slate-400 bg-revlio-surface px-2 py-0.5 rounded-full border border-revlio-border">${issue.category}</span>
+          </div>
+          <h4 class="font-bold text-white text-sm sm:text-base">${issue.title}</h4>
+          <p class="text-slate-300 mt-1 leading-relaxed">${issue.description}</p>
+          ${issue.why_it_matters ? `
+            <div class="mt-2.5 p-2.5 rounded-lg bg-revlio-surface/80 border border-revlio-border/60">
+              <span class="text-slate-400 font-semibold block text-[11px]">Why It Matters:</span>
+              <p class="text-slate-300 text-xs mt-0.5">${issue.why_it_matters}</p>
+            </div>
+          ` : ''}
+          ${issue.recommendation ? `
+            <div class="mt-2 p-2.5 rounded-lg bg-blue-950/20 border border-blue-500/20 font-mono text-[11px] text-blue-200">
+              <span class="text-blue-300 font-semibold block uppercase">Fix Recommendation:</span>
+              ${issue.recommendation}
+            </div>
+          ` : ''}
+        </div>
+      `;
+    }
+
+    function openLeadModal() {
+      document.getElementById('leadModal').classList.remove('hidden');
+    }
+    function closeLeadModal() {
+      document.getElementById('leadModal').classList.add('hidden');
+    }
+
+    async function handleLeadSubmit(e) {
+      e.preventDefault();
+      const auditId = currentAudit ? currentAudit.audit_id : '';
+      const fullName = document.getElementById('leadName').value.trim();
+      const email = document.getElementById('leadEmail').value.trim();
+      const company = document.getElementById('leadCompany').value.trim();
+      const phone = document.getElementById('leadPhone').value.trim();
+
+      const btn = document.getElementById('leadSubmitBtn');
+      btn.disabled = true;
+      btn.innerHTML = `<div class="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div><span>Syncing & Unlocking...</span>`;
+
+      try {
+        const endpoint = window.location.port ? '/api/lead' : 'api/lead.php';
+        await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ audit_id: auditId, full_name: fullName, email, company, phone })
+        });
+      } catch (e) {}
+
+      closeLeadModal();
+      renderUnlockedReport();
+    }
+
+    function renderUnlockedReport() {
+      document.getElementById('teaserSection').classList.add('hidden');
+      document.getElementById('unlockedSection').classList.remove('hidden');
+
+      const data = currentAudit;
+      const scores = data.scores || {};
+      const meta = data.meta_data || {};
+      const cwv = meta.core_web_vitals || {};
+
+      document.getElementById('unlockedDomainTitle').innerText = `Website Audit for ${data.domain}`;
+      document.getElementById('unlockedUrlSubtitle').innerText = data.url;
+
+      // Score Grid
+      const cats = [
+        { label: 'Security', score: scores.security || 0, weight: '25%' },
+        { label: 'Performance', score: scores.performance || 0, weight: '25%' },
+        { label: 'SEO', score: scores.seo || 0, weight: '20%' },
+        { label: 'Technical', score: scores.technical || 0, weight: '15%' },
+        { label: 'Mobile', score: scores.mobile || 0, weight: '10%' },
+        { label: 'Accessibility', score: scores.accessibility || 0, weight: '5%' },
+      ];
+
+      document.getElementById('unlockedScoreGrid').innerHTML = cats.map(c => `
+        <div class="bg-revlio-surface/90 border border-revlio-border rounded-2xl p-3.5 text-center">
+          <span class="text-[9px] uppercase font-bold text-slate-400 block mb-1">${c.label}</span>
+          <span class="text-2xl font-black text-white">${c.score}</span>
+          <span class="text-[10px] text-slate-500 block mt-0.5">Weight: ${c.weight}</span>
+        </div>
+      `).join('');
+
+      // Core Web Vitals
+      const cwvCards = [
+        { name: 'Largest Contentful Paint (LCP)', val: cwv.lcp || '1.8 s', target: '< 2.5 s' },
+        { name: 'First Contentful Paint (FCP)', val: cwv.fcp || '0.9 s', target: '< 1.8 s' },
+        { name: 'Cumulative Layout Shift (CLS)', val: cwv.cls || '0.02', target: '< 0.10' },
+        { name: 'Server Response (TTFB)', val: cwv.ttfb || '180 ms', target: '< 300 ms' },
+      ];
+      const cwvHtml = cwvCards.map(c => `
+        <div class="rounded-2xl border border-revlio-border bg-revlio-card/80 p-4">
+          <span class="text-xs font-semibold text-slate-400 block mb-1">${c.name}</span>
+          <div class="text-2xl font-black text-white mb-1">${c.val}</div>
+          <span class="text-[10px] text-slate-500 font-mono">Google Benchmark: ${c.target}</span>
+        </div>
+      `).join('');
+
+      document.getElementById('unlockedCwvGrid').innerHTML = cwvHtml;
+      document.getElementById('unlockedPerfCwv').innerHTML = cwvHtml;
+
+      // Populate issues
+      const results = data.results || [];
+      document.getElementById('unlockedAllIssues').innerHTML = results.map(createIssueCardHtml).join('');
+      document.getElementById('unlockedSecurityIssues').innerHTML = results.filter(r => r.category === 'security').map(createIssueCardHtml).join('');
+      document.getElementById('unlockedPerfIssues').innerHTML = results.filter(r => r.category === 'performance').map(createIssueCardHtml).join('');
+      document.getElementById('unlockedSeoIssues').innerHTML = results.filter(r => r.category === 'seo').map(createIssueCardHtml).join('');
+      document.getElementById('unlockedTechIssues').innerHTML = results.filter(r => r.category === 'technical' || r.category === 'mobile').map(createIssueCardHtml).join('');
+
+      // Tech Stack
+      const techs = data.technologies || [];
+      document.getElementById('unlockedTechBadges').innerHTML = techs.length ? techs.map(t => `
+        <div class="p-3.5 rounded-xl border border-revlio-border bg-revlio-surface/80">
+          <span class="text-xs font-bold text-white block">${t.name}</span>
+          <span class="text-[10px] uppercase text-slate-400">${t.category}</span>
+        </div>
+      `).join('') : '<p class="text-xs text-slate-400">No public framework markers detected.</p>';
+
+      lucide.createIcons();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-btn').forEach(b => {
+        b.className = 'tab-btn flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-xs sm:text-sm bg-revlio-card text-slate-400 border border-revlio-border';
+      });
+      document.getElementById(`tabBtn-${tabId}`).className = 'tab-btn active-tab flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-xs sm:text-sm bg-blue-600 text-white shadow-lg';
+
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+      document.getElementById(`tabContent-${tabId}`).classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function resetAudit() {
+      document.getElementById('scanningSection').classList.add('hidden');
+      document.getElementById('teaserSection').classList.add('hidden');
+      document.getElementById('unlockedSection').classList.add('hidden');
+      document.getElementById('heroSection').classList.remove('hidden');
+      document.getElementById('targetUrl').value = '';
+      currentAudit = null;
+      lucide.createIcons();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    async function fetchRecentAudits() {
+      try {
+        const endpoint = window.location.port ? '/api/recent' : 'api/recent.php';
+        const res = await fetch(endpoint);
+        if (res.ok) {
+          const recents = await res.json();
+          document.getElementById('recentList').innerHTML = recents.map(r => `
+            <div class="flex items-center gap-2 px-3 py-1.5 rounded-full border border-revlio-border bg-revlio-surface/80 text-xs text-slate-300 shadow-sm">
+              <i data-lucide="globe" class="h-3.5 w-3.5 text-blue-400"></i>
+              <span class="font-semibold">${r.domain}</span>
+              <span class="font-mono text-emerald-400 font-bold">${r.overall_score}/100</span>
+            </div>
+          `).join('');
+          lucide.createIcons();
+        }
+      } catch (e) {}
+    }
+  </script>
+</body>
+</html>
